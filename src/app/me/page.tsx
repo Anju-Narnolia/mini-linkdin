@@ -1,49 +1,34 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../store/auth";
-import { getMe, updateMe } from "../../lib/api";
+import { updateMe } from "../../lib/api";
 import Image from "next/image";
 
 export default function EditProfilePage() {
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const { token, user, setUser } = useAuth();
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", bio: "" });
-  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ name: user?.name || "", bio: user?.bio || "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-
+  if (!mounted) return null;
   // Redirect if not logged in
-  useEffect(() => {
-    if (!token) router.replace("/login");
-  }, [token, router]);
-
-  // Fetch latest user info
-  useEffect(() => {
-    if (!token) return;
-
-    const fetchUser = async () => {
-      try {
-        const data = await getMe(token);
-        setUser(data);
-        setForm({ name: data.name || "", bio: data.bio || "" });
-      } catch (e) {
-        setError((e as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, [token, setUser]);
+  if (!token) {
+    if (typeof window !== "undefined") router.replace("/login");
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSaving(true);
-
     try {
-      const updated = await updateMe(token!, form);
+      const updated = await updateMe(token, user!.id, form);
       setUser(updated);
       setFormOpen(false);
     } catch (err) {
@@ -52,18 +37,14 @@ export default function EditProfilePage() {
       setSaving(false);
     }
   };
-  if (!token) return null;
-  if (loading)
-    return <div className="flex justify-center mt-10">Loading...</div>;
-
   return (
-    <main className="flex flex-col items-center justify-center  p-4 max-w-8xl bg-indigo-300">
-      <div className="w-full max-w-md flex items-center gap-6 border p-4 rounded-md shadow-md">
+    <main className="flex flex-col items-center justify-center  p-4 max-w-8xl ">
+      <div className="w-full max-w-3xl flex items-center gap-6 border p-4 rounded-md shadow-md bg-gray-50">
         <Image
           src={"https://www.w3schools.com/howto/img_avatar.png"}
           alt={user?.name || "Profile"}
-          width={100}
-          height={100}
+          width={200}
+          height={200}
           className="rounded-full"
         />
         <div>
@@ -78,7 +59,6 @@ export default function EditProfilePage() {
           </button>
         </div>
       </div>
-
       {formOpen && (
         <form
           onSubmit={handleSubmit}
@@ -122,6 +102,17 @@ export default function EditProfilePage() {
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </form>
       )}
+      <div className="max-w-5xl p-20">
+        <p className="text-4xl ">My Posts</p>
+        
+        <ul className="space-y-16 ">
+            {user?.posts?.map((post: { _id: string; text: string }) => (
+              <li key={post._id} className="p-4 border rounded">
+                {post.text}
+              </li>
+            ))}
+          </ul>
+      </div>
     </main>
   );
 }

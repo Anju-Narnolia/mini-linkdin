@@ -1,30 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-interface User {
-  name: string;
-  email: string;
-  id: string;
-}
+import { useAuth } from '../store/auth';
 
 export default function NavBar() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, logout } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
+  const handleLogout = () => {
+    logout();
     router.push('/login');
   };
 
@@ -68,7 +53,7 @@ export default function NavBar() {
             </Link>
             <div className="flex items-center gap-2">
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="btn btn-sm btn-outline text-red-900 border border-e-red-900 px-4 py-2 rounded-md hover:bg-red-200"
               >
                 Logout

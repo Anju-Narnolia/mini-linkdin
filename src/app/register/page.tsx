@@ -2,24 +2,25 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { register } from "../../lib/api"; // make sure this is defined
+import { useAuth } from "../../store/auth";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
   const router = useRouter();
+  const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
-      const res = await register(form);
-      localStorage.setItem("user", JSON.stringify(res.user));
-      localStorage.setItem("token", res.token);
+      const res = await register(form.name, form.email, form.password);
+      if (!res.success) {
+        setError(res.error || "Registration failed");
+        return;
+      }
       router.push("/");
     } catch (err) {
       if (err instanceof Error) {

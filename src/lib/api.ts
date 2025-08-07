@@ -83,9 +83,10 @@ export async function getMe(token: string) {
 // UPDATE CURRENT USER
 export async function updateMe(
   token: string,
+  userId: string,
   data: { name?: string; bio?: string }
 ) {
-  const res = await fetch(`${API_URL}/me`, {
+  const res = await fetch(`/api/users/${userId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

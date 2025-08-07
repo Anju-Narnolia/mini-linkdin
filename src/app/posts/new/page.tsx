@@ -44,9 +44,9 @@ export default function NewPostPage() {
       <h1 className="text-4xl font-bold mb-4">Create Post</h1>
       <label>What do you want to share?</label>
         <textarea
-          placeholder=" Enter here (max 500 chars)"
+          placeholder=" Enter here (max 1000 chars)"
           className="textarea textarea-bordered h-60 border-gray-200 border p-2 bg-gray-100 rounded-md shadow"
-          maxLength={500}
+          maxLength={1000}
           required
           value={text}
           onChange={(e) => setText(e.target.value)}

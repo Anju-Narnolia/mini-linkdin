@@ -5,6 +5,10 @@ interface User {
   name: string;
   email: string;
   bio?: string;
+  posts?: Array<{
+    _id: string;
+    text: string;
+  }>;
 }
 
 interface AuthState {
