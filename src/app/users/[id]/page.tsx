@@ -78,14 +78,32 @@ export default function UserPage() {
         {error && <div className="text-red-500 mb-2">{error}</div>}
         <h2 className="text-4xl font-bold mb-2">Posts</h2>
         
-          <ul className="space-y-16 ">
-            {user.posts.map((post) => (
-              <li key={post._id} className="p-4 border rounded">
-                {post.text}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <form onSubmit={handlePost} className="mb-8">
+          <textarea
+            value={postText}
+            onChange={(e) => setPostText(e.target.value)}
+            placeholder="What's on your mind?"
+            className="w-full p-3 border rounded-lg resize-none"
+            rows={3}
+            maxLength={500}
+          />
+          <button
+            type="submit"
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            disabled={!postText.trim()}
+          >
+            Post
+          </button>
+        </form>
+        
+        <ul className="space-y-16 ">
+          {user.posts.map((post) => (
+            <li key={post._id} className="p-4 border rounded">
+              {post.text}
+            </li>
+          ))}
+        </ul>
+      </div>
     </main>
   );
 }
